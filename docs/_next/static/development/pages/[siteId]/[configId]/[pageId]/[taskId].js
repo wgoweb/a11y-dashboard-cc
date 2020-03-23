@@ -180,12 +180,14 @@ var groupByMessage = function groupByMessage(issues) {
         selector = cur.selector,
         element = cur.element,
         code = cur.code;
-    var criterion = code.criterion;
+    var criterion = code.criterion,
+        techniques = code.techniques;
     var handle = criterion.handle,
         num = criterion.num;
     var issueMessage = prev[message] || {
       criterion: "".concat(num, ". ").concat(handle),
       message: message,
+      techniques: techniques,
       items: [],
       count: 0
     };
@@ -217,12 +219,69 @@ var groupBySection = function groupBySection(issues, keyFn) {
   return _babel_runtime_corejs2_core_js_object_values__WEBPACK_IMPORTED_MODULE_1___default()(groupedObj);
 };
 
+var getTechniquePrefix = function getTechniquePrefix(technique) {
+  var matches = technique.match(/([A-z]{1,})\d*/);
+  if (matches.length < 2) return null;
+
+  switch (matches[1].toUpperCase()) {
+    case 'ARIA':
+      return 'aria';
+
+    case 'SCR':
+      return 'client-side-script';
+
+    case 'C':
+      return 'css';
+
+    case 'F':
+      return 'failures';
+
+    case 'FLASH':
+      return 'flash';
+
+    case 'G':
+      return 'general';
+
+    case 'H':
+      return 'html';
+
+    case 'PDF':
+      return 'pdf';
+
+    case 'SL':
+      return 'silverlight';
+
+    case 'SM':
+      return 'smil';
+
+    case 'T':
+      return 'text';
+
+    default:
+      return null;
+  }
+};
+
+var getTechniqueLink = function getTechniqueLink(technique) {
+  var prefix = getTechniquePrefix(technique);
+  var url = "https://www.w3.org/WAI/WCAG21/Techniques/".concat(prefix, "/").concat(technique);
+  return __jsx(_material_ui_core__WEBPACK_IMPORTED_MODULE_2__["Link"], {
+    target: "_blank",
+    href: url,
+    __source: {
+      fileName: _jsxFileName,
+      lineNumber: 128
+    },
+    __self: this
+  }, technique);
+};
+
 var messageList = function messageList(issueMessages, stylesProps) {
   var classes = stylesProps.classes;
   return __jsx("ul", {
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 97
+      lineNumber: 135
     },
     __self: this
   }, issueMessages.map(function (im, imIndex) {
@@ -230,20 +289,39 @@ var messageList = function messageList(issueMessages, stylesProps) {
       key: imIndex,
       __source: {
         fileName: _jsxFileName,
-        lineNumber: 99
+        lineNumber: 137
       },
       __self: this
     }, __jsx(_material_ui_core__WEBPACK_IMPORTED_MODULE_2__["Typography"], {
       component: "span",
       __source: {
         fileName: _jsxFileName,
-        lineNumber: 100
+        lineNumber: 138
       },
       __self: this
-    }, im.criterion, ": ", im.message), __jsx(_material_ui_core__WEBPACK_IMPORTED_MODULE_2__["List"], {
+    }, im.criterion, ": ", im.message), __jsx(_material_ui_core__WEBPACK_IMPORTED_MODULE_2__["Typography"], {
+      component: "div",
       __source: {
         fileName: _jsxFileName,
-        lineNumber: 103
+        lineNumber: 141
+      },
+      __self: this
+    }, "Techniques: ", im.techniques.map(function (t, i) {
+      return __jsx("span", {
+        key: i,
+        style: {
+          marginRight: "0.5em"
+        },
+        __source: {
+          fileName: _jsxFileName,
+          lineNumber: 143
+        },
+        __self: this
+      }, getTechniqueLink(t));
+    })), __jsx(_material_ui_core__WEBPACK_IMPORTED_MODULE_2__["List"], {
+      __source: {
+        fileName: _jsxFileName,
+        lineNumber: 146
       },
       __self: this
     }, im.items.map(function (item, itemIndex) {
@@ -252,7 +330,7 @@ var messageList = function messageList(issueMessages, stylesProps) {
         className: classes.messageListItem,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 105
+          lineNumber: 148
         },
         __self: this
       }, __jsx(_material_ui_core__WEBPACK_IMPORTED_MODULE_2__["Typography"], {
@@ -260,13 +338,13 @@ var messageList = function messageList(issueMessages, stylesProps) {
         component: "div",
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 106
+          lineNumber: 149
         },
         __self: this
       }, __jsx("em", {
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 107
+          lineNumber: 150
         },
         __self: this
       }, item.selector)), __jsx(_material_ui_core__WEBPACK_IMPORTED_MODULE_2__["Typography"], {
@@ -274,13 +352,13 @@ var messageList = function messageList(issueMessages, stylesProps) {
         component: "div",
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 109
+          lineNumber: 152
         },
         __self: this
       }, __jsx("code", {
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 110
+          lineNumber: 153
         },
         __self: this
       }, item.element)));
@@ -317,7 +395,7 @@ var sectionPanel = function sectionPanel(groupedIssue, issueType, stylesProps) {
     },
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 140
+      lineNumber: 183
     },
     __self: this
   }, __jsx(_material_ui_core__WEBPACK_IMPORTED_MODULE_2__["ExpansionPanelSummary"], {
@@ -325,7 +403,7 @@ var sectionPanel = function sectionPanel(groupedIssue, issueType, stylesProps) {
       className: expandIconClassName,
       __source: {
         fileName: _jsxFileName,
-        lineNumber: 142
+        lineNumber: 185
       },
       __self: this
     }),
@@ -334,43 +412,48 @@ var sectionPanel = function sectionPanel(groupedIssue, issueType, stylesProps) {
     className: panelHeaderClassName,
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 141
-    },
-    __self: this
-  }, __jsx(_material_ui_core__WEBPACK_IMPORTED_MODULE_2__["Tooltip"], {
-    title: title,
-    interactive: true,
-    __source: {
-      fileName: _jsxFileName,
-      lineNumber: 147
+      lineNumber: 184
     },
     __self: this
   }, __jsx(_material_ui_core__WEBPACK_IMPORTED_MODULE_2__["Typography"], {
     component: "span",
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 148
+      lineNumber: 190
     },
     __self: this
   }, num, ". ", handle, " ", __jsx("strong", {
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 148
+      lineNumber: 190
     },
     __self: this
-  }, "(", count, ")")))), __jsx(_material_ui_core__WEBPACK_IMPORTED_MODULE_2__["ExpansionPanelDetails"], {
+  }, "(", count, ")"))), __jsx(_material_ui_core__WEBPACK_IMPORTED_MODULE_2__["ExpansionPanelDetails"], {
     style: {
       flexDirection: 'column'
     },
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 151
+      lineNumber: 192
     },
     __self: this
-  }, hasSubgroup ? __jsx(_material_ui_core__WEBPACK_IMPORTED_MODULE_2__["List"], {
+  }, __jsx(_material_ui_core__WEBPACK_IMPORTED_MODULE_2__["Typography"], {
+    gutterBottom: true,
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 153
+      lineNumber: 193
+    },
+    __self: this
+  }, "Info: ", __jsx("em", {
+    __source: {
+      fileName: _jsxFileName,
+      lineNumber: 193
+    },
+    __self: this
+  }, title)), hasSubgroup ? __jsx(_material_ui_core__WEBPACK_IMPORTED_MODULE_2__["List"], {
+    __source: {
+      fileName: _jsxFileName,
+      lineNumber: 195
     },
     __self: this
   }, issues.map(function (gi) {
@@ -380,7 +463,7 @@ var sectionPanel = function sectionPanel(groupedIssue, issueType, stylesProps) {
       component: "li",
       __source: {
         fileName: _jsxFileName,
-        lineNumber: 155
+        lineNumber: 197
       },
       __self: this
     }, sectionPanel(gi, issueType, stylesProps));
@@ -407,7 +490,7 @@ var IssuesList = function IssuesList(props) {
   return __jsx(_material_ui_core__WEBPACK_IMPORTED_MODULE_2__["List"], {
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 180
+      lineNumber: 222
     },
     __self: this
   }, groupedIssues.map(function (gi) {
@@ -417,7 +500,7 @@ var IssuesList = function IssuesList(props) {
       component: "li",
       __source: {
         fileName: _jsxFileName,
-        lineNumber: 182
+        lineNumber: 224
       },
       __self: this
     }, sectionPanel(gi, issueType, stylesProps));
@@ -442,8 +525,10 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! react */ "./node_modules/react/index.js");
 /* harmony import */ var react__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(react__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _StatusChips__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./StatusChips */ "./components/StatusChips.tsx");
+/* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./constants */ "./components/constants.ts");
 var _jsxFileName = "C:\\projects\\projectq\\a11y-dashboard-next\\components\\ResultBoard.tsx";
 var __jsx = react__WEBPACK_IMPORTED_MODULE_1___default.a.createElement;
+
 
 
 
@@ -485,7 +570,7 @@ var ResultBoard = Object(_material_ui_core__WEBPACK_IMPORTED_MODULE_0__["withSty
     container: true,
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 38
+      lineNumber: 39
     },
     __self: this
   }, __jsx(_material_ui_core__WEBPACK_IMPORTED_MODULE_0__["Grid"], {
@@ -494,13 +579,13 @@ var ResultBoard = Object(_material_ui_core__WEBPACK_IMPORTED_MODULE_0__["withSty
     className: classes.pagesList,
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 39
+      lineNumber: 40
     },
     __self: this
   }, __jsx(_material_ui_core__WEBPACK_IMPORTED_MODULE_0__["List"], {
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 40
+      lineNumber: 41
     },
     __self: this
   }, pages.sort(sortPage).map(function (cp) {
@@ -508,18 +593,18 @@ var ResultBoard = Object(_material_ui_core__WEBPACK_IMPORTED_MODULE_0__["withSty
       key: cp._id,
       component: "a",
       button: true,
-      href: "/".concat(site._id, "/").concat(configId, "/").concat(cp._id, "/").concat(currentTaskId),
+      href: "".concat(_constants__WEBPACK_IMPORTED_MODULE_3__["BASE_URL"], "/").concat(site._id, "/").concat(configId, "/").concat(cp._id, "/").concat(currentTaskId),
       selected: cp._id == currentPageId,
       __source: {
         fileName: _jsxFileName,
-        lineNumber: 43
+        lineNumber: 44
       },
       __self: this
     }, __jsx(_material_ui_core__WEBPACK_IMPORTED_MODULE_0__["ListItemText"], {
       primary: __jsx(react__WEBPACK_IMPORTED_MODULE_1___default.a.Fragment, {
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 48
+          lineNumber: 49
         },
         __self: this
       }, __jsx(_material_ui_core__WEBPACK_IMPORTED_MODULE_0__["Typography"], {
@@ -527,20 +612,20 @@ var ResultBoard = Object(_material_ui_core__WEBPACK_IMPORTED_MODULE_0__["withSty
         color: cp.title ? "textPrimary" : "error",
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 49
+          lineNumber: 50
         },
         __self: this
       }, cp.title || __jsx("em", {
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 50
+          lineNumber: 51
         },
         __self: this
       }, "Untitled Page"))),
       secondary: __jsx(react__WEBPACK_IMPORTED_MODULE_1___default.a.Fragment, {
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 54
+          lineNumber: 55
         },
         __self: this
       }, __jsx(_material_ui_core__WEBPACK_IMPORTED_MODULE_0__["Typography"], {
@@ -549,7 +634,7 @@ var ResultBoard = Object(_material_ui_core__WEBPACK_IMPORTED_MODULE_0__["withSty
         component: "div",
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 55
+          lineNumber: 56
         },
         __self: this
       }, cp.url), __jsx(_StatusChips__WEBPACK_IMPORTED_MODULE_2__["default"], {
@@ -559,14 +644,14 @@ var ResultBoard = Object(_material_ui_core__WEBPACK_IMPORTED_MODULE_0__["withSty
         noticeCount: cp.noticeCount,
         __source: {
           fileName: _jsxFileName,
-          lineNumber: 58
+          lineNumber: 59
         },
         __self: this
       })),
       disableTypography: true,
       __source: {
         fileName: _jsxFileName,
-        lineNumber: 47
+        lineNumber: 48
       },
       __self: this
     }));
@@ -576,7 +661,7 @@ var ResultBoard = Object(_material_ui_core__WEBPACK_IMPORTED_MODULE_0__["withSty
     className: classes.pageContent,
     __source: {
       fileName: _jsxFileName,
-      lineNumber: 66
+      lineNumber: 67
     },
     __self: this
   }, children));
@@ -952,6 +1037,22 @@ var TaskPageResult = function TaskPageResult(props) {
 
 /***/ }),
 
+/***/ "./components/constants.ts":
+/*!*********************************!*\
+  !*** ./components/constants.ts ***!
+  \*********************************/
+/*! exports provided: BASE_URL, GRAPHQL_URL */
+/***/ (function(module, __webpack_exports__, __webpack_require__) {
+
+"use strict";
+__webpack_require__.r(__webpack_exports__);
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "BASE_URL", function() { return BASE_URL; });
+/* harmony export (binding) */ __webpack_require__.d(__webpack_exports__, "GRAPHQL_URL", function() { return GRAPHQL_URL; });
+var BASE_URL = "/a11y-dashboard-gdrv";
+var GRAPHQL_URL = "http://localhost:3037/graphql";
+
+/***/ }),
+
 /***/ "./components/get-from-url.ts":
 /*!************************************!*\
   !*** ./components/get-from-url.ts ***!
@@ -970,11 +1071,12 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var isomorphic_fetch__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! isomorphic-fetch */ "./node_modules/isomorphic-fetch/fetch-npm-browserify.js");
 /* harmony import */ var isomorphic_fetch__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(isomorphic_fetch__WEBPACK_IMPORTED_MODULE_2__);
 /* harmony import */ var swr__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! swr */ "./node_modules/swr/esm/index.js");
+/* harmony import */ var _constants__WEBPACK_IMPORTED_MODULE_4__ = __webpack_require__(/*! ./constants */ "./components/constants.ts");
 
 
 
 
-var GRAPHQL_URL = 'http://10.10.4.154:3037/graphql';
+
 var graphQlFetcher = function graphQlFetcher(query) {
   var response, jsonResponse, error;
   return _babel_runtime_corejs2_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.async(function graphQlFetcher$(_context) {
@@ -982,7 +1084,7 @@ var graphQlFetcher = function graphQlFetcher(query) {
       switch (_context.prev = _context.next) {
         case 0:
           _context.next = 2;
-          return _babel_runtime_corejs2_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(isomorphic_fetch__WEBPACK_IMPORTED_MODULE_2___default()(GRAPHQL_URL, {
+          return _babel_runtime_corejs2_regenerator__WEBPACK_IMPORTED_MODULE_0___default.a.awrap(isomorphic_fetch__WEBPACK_IMPORTED_MODULE_2___default()(_constants__WEBPACK_IMPORTED_MODULE_4__["GRAPHQL_URL"], {
             method: 'POST',
             mode: 'cors',
             credentials: 'same-origin',
